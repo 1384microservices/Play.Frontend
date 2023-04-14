@@ -5,10 +5,12 @@ import authService from './api-authorization/AuthorizeService';
 import { AuthorizationPaths } from './api-authorization/ApiAuthorizationConstants';
 import { ApplicationPaths } from './Constants';
 
-export class NavMenu extends Component {
+export class NavMenu extends Component
+{
   static displayName = NavMenu.name;
 
-  constructor(props) {
+  constructor(props)
+  {
     super(props);
 
     this.state = {
@@ -18,16 +20,19 @@ export class NavMenu extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount()
+  {
     this._subscription = authService.subscribe(() => this.populateState());
     this.populateState();
   }
 
-  componentWillUnmount() {
+  componentWillUnmount()
+  {
     authService.unsubscribe(this._subscription);
   }
 
-  async populateState() {
+  async populateState()
+  {
     const [isAuthenticated, user] = await Promise.all([authService.isAuthenticated(), authService.getUser()])
     this.setState({
       isAuthenticated,
@@ -36,7 +41,8 @@ export class NavMenu extends Component {
     });
   }
 
-  render() {
+  render()
+  {
     return (
       <header>
         <Navbar bg="light" expand="lg">
@@ -52,15 +58,19 @@ export class NavMenu extends Component {
     );
   }
 
-  checkAuthAndRenderMenuItems() {
-    if (!this.state.isAuthenticated) {
+  checkAuthAndRenderMenuItems()
+  {
+    if (!this.state.isAuthenticated)
+    {
       return this.anonymousView();
-    } else {
+    } else
+    {
       return this.authenticatedView();
     }
   }
 
-  anonymousView() {
+  anonymousView()
+  {
     const loginPath = `${AuthorizationPaths.Login}`;
     return (<Fragment>
       <Nav className="mr-auto">
@@ -72,12 +82,14 @@ export class NavMenu extends Component {
     </Fragment>);
   }
 
-  authenticatedView() {
-    if (this.state.role === "Admin") {
+  authenticatedView()
+  {
+    if (this.state.role === "Admin")
+    {
       return (<Fragment>
         <Nav className="mr-auto">
           <Nav.Link as={Link} to="/">Home</Nav.Link>
-          <Nav.Link as={Link} to={ApplicationPaths.InventoryPath}>My Inventory</Nav.Link>
+          {this.storeAndInventoryItems()}
           <Nav.Link as={Link} to={ApplicationPaths.CatalogPath}>Catalog</Nav.Link>
           <Nav.Link as={Link} to={ApplicationPaths.UsersPath}>Users</Nav.Link>
         </Nav>
@@ -86,25 +98,36 @@ export class NavMenu extends Component {
         </Nav>
       </Fragment>);
     }
-    else if (this.state.role === "Player") {
+    else if (this.state.role === "Player")
+    {
       return (<Fragment>
         <Nav className="mr-auto">
           <Nav.Link as={Link} to="/">Home</Nav.Link>
-          <Nav.Link as={Link} to={ApplicationPaths.InventoryPath}>My Inventory</Nav.Link>
+          {this.storeAndInventoryItems()}
         </Nav>
         <Nav>
           {this.profileAndLogoutItems()}
         </Nav>
       </Fragment>);
     }
-    else {
+    else
+    {
       return (<Fragment>
         {this.profileAndLogoutItems()}
       </Fragment>);
     }
   }
 
-  profileAndLogoutItems() {
+  storeAndInventoryItems()
+  {
+    return (<Fragment>
+      <Nav.Link as={Link} to={ApplicationPaths.StorePath}>Store</Nav.Link>
+      <Nav.Link as={Link} to={ApplicationPaths.InventoryPath}>My Inventory</Nav.Link>
+    </Fragment>);
+  }
+
+  profileAndLogoutItems()
+  {
     const profilePath = `${AuthorizationPaths.Profile}`;
     const logoutPath = { pathname: `${AuthorizationPaths.LogOut}`, state: { local: true } };
     return (<Fragment>
